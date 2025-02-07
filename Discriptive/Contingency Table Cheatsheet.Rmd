@@ -1,0 +1,75 @@
+---
+title: "Contingency Table Cheatsheet"
+author: "Felix Schneider"
+date: "2025-02-07"
+output: html_document
+---
+
+```{r include = F}
+knitr::opts_chunk$set(error = T)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+df <- tibble(
+  gender = sample(c("m","f"),100,replace = T),
+  course = sample(c("Bsc","Ba"),100,replace = T)
+)
+head(df)
+```
+
+### Turn a tibble into a contingency table
+
+```{r}
+contable <- table(df$gender, df$course)
+contable
+
+addmargins(contable)
+```
+
+### create expectency table
+
+```{r}
+Xsq <- chisq.test(contable)
+Xsq$expected
+```
+
+### calculate Chi square, C and Ccor
+
+```{r}
+Xsq <- chisq.test(contable)
+Chisq <- as.double(as.character(Xsq$statistic))
+Chisq
+
+C <- (Chisq / (Chisq + sum(contable)))** 0.5
+C
+
+smallest.size <- as.double(min(nrow(contable),ncol(contable)))
+Ccor <- ((smallest.size/(smallest.size-1))*C**2)**0.5
+Ccor
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

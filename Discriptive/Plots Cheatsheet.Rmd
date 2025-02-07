@@ -1,0 +1,198 @@
+---
+title: "Plots Cheatsheet"
+author: "Felix Schneider"
+date: "2025-02-06"
+output: html_document
+---
+
+```{r include = F}
+knitr::opts_chunk$set(error = T)
+```
+
+```{r include = F}
+library(tidyverse)
+```
+
+
+```{r}
+election <- tibble(party = c("CDU","SPD","AFD","FDP","DIE LINKE","GRUENE","CSU","OTHER"),
+                   result.13 = c(26.8,20.5,12.6,10.7,9.2,8.9,6.2,5.0),
+                   result.17 = c(34.1,25.7,4.7,4.8,8.6,8.4,7.4,6.2)) %>% 
+  mutate(difference = result.17 - result.13)
+
+election
+```
+
+
+## Barplot
+
+```{r}
+election$result.17 %>% barplot(names.arg = election$party,
+                               ylim = c(0,50),
+                               xlab = "Parties",
+                               ylab = "2017 Vote %",
+                               las = 2, #rotates names
+                               beside = T,
+                               col = rainbow(8),)
+
+election$difference %>% barplot(names.arg = election$party,
+                                ylim = c(-10,10),
+                                xlab = "Parties",
+                                ylab = "Vote difference 13-17",
+                                las = 2,
+                                beside = T,
+                                col = rainbow(8)
+                                )
+
+rbind(election$result.13,election$result.17) %>%
+  barplot(names.arg = election$party,
+          ylim = c(0,50),
+          xlab = "Parties",
+          ylab = "Vote %",
+          las = 2,
+          beside = T,
+          col = c("green","purple"),
+          legend.text = c("2013","2017")
+          )
+```
+
+## Piechart
+
+```{r}
+election$result.17 %>% pie(labels = election$party,
+                           col = rainbow(8),
+                           main = "Election 2017")
+```
+
+## Histogram
+
+```{r}
+times <- c(568, 577, 577, 581, 640, 641, 645, 657, 673, 696, 703, 720,
+           728, 728, 728, 729, 777, 808, 824, 825, 865, 975,1007,1007)
+
+hist(times)
+
+bounds <- c(500,700,950,1100)
+hist(times,
+     breaks = bounds,
+     xlab = "time",
+     col = rainbow(3))
+```
+
+## Cumulative Frequency Distribution
+
+```{r}
+plot.ecdf(times,
+          main = "cumulative Frequency")
+
+bounds <- c(500,600,700,800,900,1000,1100)
+times.cut <- cut(
+  times,
+  breaks = bounds,
+  labels = bounds [-1]
+  )
+plot.ecdf(
+  as.integer(as.character(times.cut)),
+  xlab = "times", ylab = "H(x)",
+  main = "H Based on grouped Data"
+  )
+```
+
+get the amount of results <= 800
+
+```{r}
+H <- ecdf(times)
+H(800)
+```
+
+## Boxplot
+
+```{r}
+df <- tibble(
+  non_player = c(22.1, 22.3, 26.2, 29.6, 31.7,
+                 33.5, 38.9, 39.7, 43.2, 43.2),
+  beginner   = c(32.5, 37.1, 39.1, 40.5, 45.5,
+                 51.3, 52.6, 55.7, 55.9, 57.7),
+  tournament = c(40.1, 45.6, 51.2, 56.4, 58.1,
+                 71.1, 74.9, 75.9, 80.3, 85.3)
+  )
+
+head(df)
+
+df %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "group"
+  ) %>% 
+  group_by(group) %>% 
+  summarise(
+    mean = mean(value),
+    min = min(value),
+    Q1 = quantile(value,0.25,1),
+    median = median(value),
+    Q3 = quantile(value,0.75,1),
+    max = max(value),
+    IQR = quantile(value,0.75,1)-quantile(value,0.25,1),
+    variance = var(value)
+  )
+
+df %>% boxplot()
+
+MPG <- mpg %>% select(displ,hwy)%>%
+  mutate(displ_class = case_when(displ > 1 & displ <= 3 ~ "low",
+                                 displ > 3 & displ <= 5 ~ "medium",
+                                 displ > 5 & displ <= 8 ~ "high"))
+head(MPG)
+
+boxplot(MPG$hwy ~ MPG$displ_class,
+        xlab = "Displacement",
+        ylab = "Highway miles per galon",
+        col = rainbow(3))
+```
+
+## Scatterplot and linear regression
+
+```{r}
+df <- tibble(
+  x = c(2, 6, 3, 4, 5),
+  y = c(3, 7, 4, 7, 6)
+  )
+
+plot(
+  x = df$x,
+  y = df$y,
+  col = "blue"
+) #this part is not executable line by line if there is no plus here
+  # but it will still work when executed as a block or knited
+abline(lm(df$y ~ df$x),
+       col = "red")
+
+line <- lm(df$y ~ df$x)
+a <- line$coefficients[1]
+b <- line$coefficients[2]
+c(a,b)
+
+corelation = cor(x = df$x, y = df$y)
+corelation
+
+covariance = cov(x = df$x, y = df$y)
+covariance
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

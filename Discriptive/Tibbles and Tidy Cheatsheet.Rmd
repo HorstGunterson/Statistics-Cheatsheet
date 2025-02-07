@@ -1,0 +1,316 @@
+---
+title: "Tibbles and Tidy Cheatsheet"
+author: "Felix Schneider"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r include = F}
+knitr::opts_chunk$set(error = T)
+```
+
+```{r include = F}
+library(tidyverse)
+```
+
+## Pivot_longer
+
+Simple case
+
+```{r}
+df <- tibble(
+  student = c("Adam","Bernd"),
+  analysis = c(3,1),
+  algebra = c(4,3)
+)
+
+df
+
+df %>% 
+  pivot_longer(
+    cols = !student,
+    names_to = "subject",
+    values_to = "grade"
+  )
+```
+
+More complex case where columns have common prefixes and NAs should be dropped
+
+```{r}
+df <- tibble(
+  subject = c("algebra", "analysis"),
+  wk1 = c(5,8),
+  wk2 = c(7,NA)
+)
+
+df
+
+df %>% 
+  pivot_longer(
+  cols = starts_with("wk"),
+  names_to = "week",
+  names_prefix = "wk",
+  values_to = "attendees",
+  values_drop_na = T
+)
+```
+
+Multiple Variables stored in column names
+
+```{r}
+df <- tibble(
+  country = "germany",
+  new_a0_m = 12,
+  new_a0_f = 23,
+  newb2_m = 43,
+  newb2_f = 50,
+)
+
+df
+
+df %>% 
+  pivot_longer(
+    cols = new_a0_m:newb2_f,
+    names_to = c("type", "gender"),
+    names_pattern = "new_?(.*)_(.)",
+    values_to = "count"
+  )
+```
+
+## Pivot_wider
+
+Siple case
+
+```{r}
+df <- tibble(
+  subject = c("analysis","algebra","analysis"),
+  student = c("Bernd","Bernd","Adam"),
+  points = c(10,5,10)
+)
+
+df
+
+df %>% 
+  pivot_wider(
+    names_from = subject,
+    values_from = points
+  )
+```
+
+Filling a standard value where there is an NA
+
+```{r}
+df %>% 
+  pivot_wider(
+  names_from = subject,
+  values_from = points,
+  values_fill = 0
+)
+```
+
+Generate column names from multiple variables
+
+```{r}
+df <- tibble(
+  name = rep(c("Adam", "Bernd"),each=2),
+  variable = rep(c("rent", "income"), 2),
+  estimate = c(413,746,823,251),
+  moe = c(837,376,262,436)
+)
+
+df
+
+df %>%  
+  pivot_wider(
+    names_from = variable,
+    values_from = c(estimate,moe)
+  )
+```
+
+changing the way the new variables look
+
+```{r}
+df %>%  pivot_wider(
+  names_from = variable,
+  values_from = c(estimate,moe),
+  names_sep = ":"
+)
+```
+
+executing a function in the pivot
+
+```{r}
+df <- tibble(
+  breaks = sample(20:40,12),
+  wool = rep(c("A","B"),each=6),
+  tension = rep(rep(c("L","M","H"),each = 2),2)
+)
+
+df
+
+df %>% pivot_wider(
+  names_from = wool,
+  values_from = breaks,
+  values_fn = mean
+)
+```
+
+
+
+## Separate
+
+simple example
+
+```{r}
+df <- tibble(
+  name = c("Adam", "Bernd", "Christian", "Doris"),
+  ratio = c("81/1.83", "71/1.75", "55/1.69", "62/1.57")
+  )
+
+df
+
+df %>%  
+  separate(
+    col = "ratio",
+    into = c("weight", "height"),
+    sep = "/"
+  ) 
+```
+
+delete separated part by calling it NA
+
+```{r}
+df %>%  
+  separate(
+    col = "ratio",
+    into = c(NA, "height"),
+    sep = "/"
+  )  
+```
+
+
+
+## Tibble interaction
+
+```{r}
+df <- tibble(
+  sex = c("f", "m", "f", "f", "m"),
+  age = sample(20:35, 5, replace = T),
+  score1 = round(runif(5, 0, 25))
+)
+
+df
+```
+
+### add_row
+
+```{r}
+df2 <- df %>% 
+  add_row(
+    sex = "m",
+    age = 25,
+    score1 = 20)
+
+df2
+```
+
+### mutate and case_when
+
+```{r}
+df3 <- df2 %>% mutate(
+  score2 = sample(0:25,6,replace = T),
+  score3 = round(runif(6, 0, 25)),
+  score.total = score1 + score2 + score3,
+  grade = case_when(
+     score.total <= 37 ~ 5,
+     score.total > 37 & score.total <= 45 ~ 4,
+     score.total > 45 & score.total <= 55 ~ 3,
+     score.total > 55 & score.total <= 65 ~ 2,
+     score.total > 65 ~ 1
+  )
+)
+
+df3
+```
+
+### filter
+
+```{r}
+df3 %>% filter(sex == "m")
+```
+
+### select
+
+```{r}
+df3 %>% select(
+  sex, score.total, grade
+)
+
+df3 %>% select(score1:score3)
+```
+
+### group_by and summarise
+
+```{r}
+df3 %>% 
+  group_by(sex) %>% 
+  summarise(
+    count = n(),
+    avrg.score = mean(score.total),
+    avrg.grade = mean(grade)
+    )
+
+df3 %>% 
+  group_by(sex, grade) %>% 
+  count()
+```
+
+### Arrange
+
+```{r}
+df3 %>% arrange(score.total)
+
+df3 %>% arrange(-score.total)
+
+df4 <- df3 %>% 
+  arrange(sex,score.total)
+
+df4
+```
+
+
+
+### Head and Tail
+
+```{r}
+df4 %>% head(3)
+
+df4 %>% tail(3)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
