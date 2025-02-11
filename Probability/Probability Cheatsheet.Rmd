@@ -1,5 +1,5 @@
 ---
-title: "Propability Cheatsheet"
+title: "Probability Cheatsheet"
 author: "Felix Schneider"
 date: "2025-02-07"
 output: html_document
