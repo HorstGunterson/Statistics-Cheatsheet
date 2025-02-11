@@ -1,0 +1,77 @@
+---
+title: "Probability Cheatsheet"
+author: "Felix Schneider"
+date: "2025-02-07"
+output: html_document
+---
+
+```{r include = F}
+knitr::opts_chunk$set(error = T)
+```
+
+```{r include = F}
+library(tidyverse)
+```
+
+## Propability of outcomes from casting twi dice
+
+### Creating samplespace
+
+```{r}
+omega <- expand.grid(x = 1:6, y = 1:6)
+head(omega)
+```
+
+### Logical operations
+
+creating subsets
+
+```{r}
+a <- omega %>% filter(x == 1)
+a
+b <- omega %>% filter(x + y == 7)
+b
+```
+
+a and b
+
+```{r}
+intersect(a,b)
+```
+
+a or b
+
+```{r}
+union(a,b)
+```
+
+a and not b
+
+```{r}
+setdiff(a,b)
+```
+
+not a
+
+```{r}
+setdiff(omega,a) %>% head(10)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
