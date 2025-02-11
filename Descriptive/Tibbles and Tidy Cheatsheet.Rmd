@@ -237,6 +237,8 @@ df3
 
 ```{r}
 df3 %>% filter(sex == "m")
+
+df3 %>% filter(grade %in% 2:4)
 ```
 
 ### select
@@ -257,7 +259,8 @@ df3 %>%
   summarise(
     count = n(),
     avrg.score = mean(score.total),
-    avrg.grade = mean(grade)
+    avrg.grade = mean(grade),
+    standard_deviation.score = sd(score.total)
     )
 
 df3 %>% 
@@ -288,6 +291,22 @@ df4 %>% head(3)
 df4 %>% tail(3)
 ```
 
+### join
+
+```{r}
+df.j <-  tibble(
+  grade.de = c(1,2,3,4,5),
+  grade.en = c("A","b","C","D","F")
+)
+
+df.joined <- left_join(
+  df4,df.j,
+  by = c("grade" = "grade.de")
+  ) %>% 
+  rename(
+    grade.en.renamed = grade.en
+  )
+```
 
 
 
