@@ -13,7 +13,7 @@ knitr::opts_chunk$set(error = T)
 library(tidyverse)
 ```
 
-## Propability of outcomes from casting twi dice
+## Propability of outcomes from casting two dice
 
 ### Creating samplespace
 
@@ -57,12 +57,205 @@ not a
 setdiff(omega,a) %>% head(10)
 ```
 
+either a or b
+
+```{r}
+symdiff(a,b)
+```
+
+## Distributions
+
+#### Example: we have 1000 students, 300 are female and 700 are male
+
+```{r}
+n <- 1000
+p.f <- 0.3
+n.f <- 300
+p.m <- 0.7
+n.m <- 700
+```
 
 
+### Binomial (with replacement)
 
+#### dbinom
+###### gives the probability that [30] students of [100] are female
 
+```{r}
+dbinom(x = 30,
+       size = 100,
+       prob = p.f)
+```
 
+###### also used to graph probability distribution
 
+```{r}
+plot(
+  x = 0:100,
+  y = dbinom(
+    x = 0:100,
+    size = 100,
+    prob = p.f
+    ),
+  type = "l",
+  xlab = "n",
+  ylab = "prob"
+)
+```
+
+#### pbinom
+###### gives the cumulative probability that a maximum of [30] students out of [100] are female
+
+```{r}
+pbinom(q = 30,
+       size = 100,
+       prob = p.f)
+```
+
+###### also used to plot cumulative probability distribution
+
+```{r}
+plot(
+  x = 0:100,
+  y = pbinom(
+    q = 0:100,
+    size = 100,
+    prob = p.f
+    ),
+  type = "l",
+  xlab = "n",
+  ylab = "prob"
+)
+```
+
+#### qbinom
+###### finds the cutoff where a given probability is reached in a binomial distribution use it when you need thresholds for passing, ranking, or decision-making
+
+```{r}
+qbinom(
+  p = 0.5,
+  size = 100,
+  prob = p.f
+)
+```
+
+###### graph not strictly neccessary but for visual aid
+
+```{r}
+plot(
+  x = seq(0,1,0.001),
+  y = qbinom(
+    p = seq(0,1,0.001),
+    size = 100,
+    prob = p.f
+    ),
+  type = "l",
+  xlab = "prob",
+  ylab = "n"
+)
+```
+
+#### rbinom
+###### simulates [10] random samples of [100] people and returns the number of female students in ea
+
+```{r}
+rbinom(10,100,p.f)
+```
+
+### Hypergeometric (Without replacement)
+
+#### dhyper
+###### gives the probability that [30] students of [100] are female
+
+```{r}
+dhyper(x = 30,
+       m = n.f,
+       n = n.m,
+       k = 100)
+```
+
+###### also used to graph probability distribution
+
+```{r}
+plot(
+  x = 0:100,
+  y = dhyper(
+    x = 0:100,
+    m = n.f,
+    n = n.m,
+    k = 100
+    ),
+  type = "l",
+  xlab = "n",
+  ylab = "prob"
+)
+```
+
+#### phyper
+###### gives the cumulative probability that a maximum of [30] students out of [100] are female
+
+```{r}
+phyper(q = 30,
+       m = n.f,
+       n = n.m,
+       k = 100)
+```
+
+###### also used to plot cumulative probability distribution
+
+```{r}
+plot(
+  x = 0:100,
+  y = phyper(
+    q = 0:100,
+    m = n.f,
+    n = n.m,
+    k = 100
+    ),
+  type = "l",
+  xlab = "n",
+  ylab = "prob"
+)
+```
+
+#### qhyper
+###### finds the cutoff where a given probability is reached in a binomial distribution use it when you need thresholds for passing, ranking, or decision-making
+
+```{r}
+qhyper(
+  p = 0.5,
+  m = n.f,
+  n = n.m,
+  k = 100
+)
+```
+
+###### graph not strictly neccessary but for visual aid
+
+```{r}
+plot(
+  x = seq(0,1,0.001),
+  y = qhyper(
+    p = seq(0,1,0.001),
+    m = n.f,
+    n = n.m,
+    k = 100,
+    ),
+  type = "l",
+  xlab = "prob",
+  ylab = "n"
+)
+```
+
+#### rhyper
+###### simulates [10] random samples of [100] people and returns the number of female students in ea
+
+```{r}
+rhyper(nn = 10,
+        m = n.f,
+        n = n.m,
+        k = 100)
+```
 
 
 
